@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Feb  9 13:07:03 2024
+
+@author: roy.fong
+"""
+
 import sys
  
 # Constants
@@ -38,10 +45,9 @@ def floyd_recursive(distance):
         with_intermediate = calculate_min_distance(start, intermediate, intermediate - 1) + calculate_min_distance(intermediate, end, intermediate - 1)
         return min(without_intermediate, with_intermediate)
  
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                distance[i][j] = calculate_min_distance(i, j, k)
+    for i in range(n):
+       for j in range(n):
+           distance[i][j] = calculate_min_distance(i, j, len(distance)-1)
  
     return distance
  
