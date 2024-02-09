@@ -1,45 +1,73 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Feb  7 17:19:02 2024
-
-@author: roy.fong
-"""
-
 import sys
-
+ 
+# Constants
 NO_PATH = sys.maxsize
-graph = [[0, 7, NO_PATH, 8],
-[NO_PATH, 0, 5, NO_PATH],
-[NO_PATH, NO_PATH, 0, 2],
-[NO_PATH, NO_PATH, NO_PATH, 0]]
-MAX_LENGTH = len(graph[0])
-
-def floyd(distance:list)->list:
+ 
+# Example graph
+graph = [
+    [0, 7, NO_PATH, 8],
+    [NO_PATH, 0, 5, NO_PATH],
+    [NO_PATH, NO_PATH, 0, 2],
+    [NO_PATH, NO_PATH, NO_PATH, 0]
+]
+ 
+def floyd_recursive(distance):
     """
-    Floyd's algorithm with recurrsion, Time complexity: O(n**2)
-    """
-    for start_node in range(len(graph[0])):
-        for end_node in range(len(graph[0])):
-        #return all possible paths and find the minimum
-            distance[start_node][end_node] = calculate_dist(start_node, end_node, 3)
-        #Any value that have sys.maxsize has no path
-    print (distance)
-    
-def calculate_dist(start:int,end:int,step:int)->int:
-    """
-    Recurrsion function for calculate the minimum distance.
-    
+    Recursively implements Floyd's algorithm to find the shortest paths between all pairs of vertices.
+    This function initializes the recursive process.
+ 
     Args:
-        start (int): start_node
-        end (int): end_node 
-        step (int): flexiability of intermediate_node (e.g.: 3 means 0,1,2,3 nodes can be the intermediate_node)
-    
-    Returns:
-        int: Minimum distance from 
-    """    
-    if step==-1:
-        return graph[start][end]
-    return min(calculate_dist(start, end, step-1),calculate_dist(start, step, step-1)+calculate_dist(step, end, step-1))
-
-floyd(graph)
-
+        distance (list): Adjacency matrix representing distances between nodes in the graph.
+    """
+    n = len(distance)
+    def calculate_min_distance(start, end, intermediate):
+        """
+        Recursively calculates the minimum distance between two nodes considering an intermediate node.
+ 
+        Args:
+            start (int): The starting node index.
+            end (int): The ending node index.
+            intermediate (int): The index of the intermediate node through which the path may pass.
+ 
+        Returns:
+            int: The minimum distance between start and end nodes.
+        """
+        if intermediate == -1:
+            return distance[start][end]
+        without_intermediate = calculate_min_distance(start, end, intermediate - 1)
+        with_intermediate = calculate_min_distance(start, intermediate, intermediate - 1) + calculate_min_distance(intermediate, end, intermediate - 1)
+        return min(without_intermediate, with_intermediate)
+ 
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                distance[i][j] = calculate_min_distance(i, j, k)
+ 
+    return distance
+ 
+# Running the algorithm
+result = floyd_recursive(graph)
+for row in result:
+    print(row)
+ 
+ 
+import unittest
+ 
+class TestFloydAlgorithm(unittest.TestCase):
+    def test_floyd_recursive(self):
+        graph = [
+            [0, 7, sys.maxsize, 8],
+            [sys.maxsize, 0, 5, sys.maxsize],
+            [sys.maxsize, sys.maxsize, 0, 2],
+            [sys.maxsize, sys.maxsize, sys.maxsize, 0]
+        ]
+        expected_result = [
+            [0, 7, 12, 8],
+            [sys.maxsize, 0, 5, 7],
+            [sys.maxsize, sys.maxsize, 0, 2],
+            [sys.maxsize, sys.maxsize, sys.maxsize, 0]
+        ]
+        self.assertEqual(floyd_recursive(graph), expected_result)
+ 
+if __name__ == '__main__':
+    unittest.main()
